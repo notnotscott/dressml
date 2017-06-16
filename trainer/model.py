@@ -93,14 +93,14 @@ def _cnn_model_fn(features, labels, mode):
       inputs=dense, rate=0.4, training=(mode == learn.ModeKeys.TRAIN))
 
   # Logits Layer
-  logits = tf.layers.dense(inputs=dropout, units=11)
+  logits = tf.layers.dense(inputs=dropout, units=100)
 
   loss = None
   train_op = None
 
   # Calculate Loss (for both TRAIN and EVAL modes)
   if mode != learn.ModeKeys.INFER:
-    onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=10)
+    onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=7)
     loss = tf.losses.softmax_cross_entropy(
         onehot_labels=onehot_labels, logits=logits)
 
