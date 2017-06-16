@@ -46,7 +46,7 @@ def read_and_decode(filename_queue):
   return image, label
 
 
-def input_fn(filename, batch_size=100, num_epochs=None):
+def input_fn(filename, batch_size=1, num_epochs=None):
   filename_queue = tf.train.string_input_producer(
       [filename], num_epochs=num_epochs)
 
@@ -58,7 +58,7 @@ def input_fn(filename, batch_size=100, num_epochs=None):
   return {'image': images}, labels
 
 
-def get_input_fn(filename, num_epochs=None, batch_size=100):
+def get_input_fn(filename, num_epochs=None, batch_size=1):
   return lambda: input_fn(filename, batch_size)
 
 
