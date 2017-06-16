@@ -136,7 +136,7 @@ def get_eval_metrics():
 
 
 def serving_input_fn():
-  feature_placeholders = {'image': tf.placeholder(tf.float32, [None, 784])}
+  feature_placeholders = {'image': tf.placeholder(tf.float32, [None, 256*256])}
   features = {
     key: tensor
     for key, tensor in feature_placeholders.items()
