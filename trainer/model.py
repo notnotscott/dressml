@@ -93,7 +93,7 @@ def _cnn_model_fn(features, labels, mode):
       inputs=dense, rate=0.4, training=(mode == learn.ModeKeys.TRAIN))
 
   # Logits Layer
-  logits = tf.layers.dense(inputs=dropout, units=10)
+  logits = tf.layers.dense(inputs=dropout, units=11)
 
   loss = None
   train_op = None
