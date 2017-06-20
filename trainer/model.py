@@ -46,7 +46,7 @@ def read_and_decode(filename_queue):
   return image, label
 
 
-def input_fn(filename, batch_size=1, num_epochs=None):
+def input_fn(filename, batch_size=100, num_epochs=None):
   filename_queue = tf.train.string_input_producer(
       [filename], num_epochs=num_epochs)
 
@@ -58,7 +58,7 @@ def input_fn(filename, batch_size=1, num_epochs=None):
   return {'image': images}, labels
 
 
-def get_input_fn(filename, num_epochs=None, batch_size=1):
+def get_input_fn(filename, num_epochs=None, batch_size=100):
   return lambda: input_fn(filename, batch_size)
 
 
@@ -87,7 +87,7 @@ def _cnn_model_fn(features, labels, mode):
   pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2)
 
   # Dense Layer
-  pool2_flat = tf.reshape(pool2, [-1, 26214400])
+  pool2_flat = tf.reshape(pool2, [-1, 262144])
   dense = tf.layers.dense(inputs=pool2_flat, units=1024, activation=tf.nn.relu)
   dropout = tf.layers.dropout(
       inputs=dense, rate=0.4, training=(mode == learn.ModeKeys.TRAIN))
