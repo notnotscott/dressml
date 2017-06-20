@@ -177,9 +177,9 @@ def _cnn_model_fn(features, labels, mode):
 
   # Calculate Loss (for both TRAIN and EVAL modes)
     if mode != learn.ModeKeys.INFER:
-        onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), axis = -1, depth=1)
+        #onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=1)
         loss = tf.losses.softmax_cross_entropy(
-        onehot_labels=onehot_labels, logits=logits)
+        onehot_labels=labels, logits=logits)
 
   # Configure the Training Op (for TRAIN mode)
     if mode == learn.ModeKeys.TRAIN:
