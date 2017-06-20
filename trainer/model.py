@@ -99,28 +99,51 @@ def read_and_decode(filename):
   #return image, label
 
 
-def input_fn(filename, batch_size=100, num_epochs=None):
-  filename_queue = tf.train.string_input_producer(
-      [filename], num_epochs=num_epochs)
+#def input_fn(filename, batch_size=100, num_epochs=None):
+    #filename_queue = tf.train.string_input_producer(
+      #[filename], num_epochs=num_epochs)
 
-  image, label = read_and_decode(filename_queue)
-  images, labels = tf.train.batch(
-      [image, label], batch_size=batch_size,
-      capacity=1000 + 3 * batch_size)
+    #image, label = read_and_decode(filename_queue)
+    #images, labels = tf.train.batch(
+      #[image, label], batch_size=batch_size,
+      #capacity=1000 + 3 * batch_size)
 
-  return {'image': images}, labels
+    #return {'image': images}, labels
 
 
-def get_input_fn(filename, num_epochs=None, batch_size=100):
-  return lambda: input_fn(filename, batch_size)
+#def get_input_fn(filename, num_epochs=None, batch_size=100):
+#    return lambda: input_fn(filename, batch_size)
 
 
 def _cnn_model_fn(features, labels, mode):
+    
+    # associate the "label" and "image" objects with the corresponding features read from 
+    # a single example in the training data file
+    image, label = read_and_decode("data/train-00000-of-00001")
+    
+    # and similarly for the validation data
+    vimage, vlabel = read_and_decode("data/validation-00000-of-00001")
+    
+    # associate the "label_batch" and "image_batch" objects with a randomly selected batch---
+    # of labels and images respectively
+    imageBatch, labelBatch = tf.train.shuffle_batch(
+        [image, label], batch_size=100,
+        capacity=2000,
+        min_after_dequeue=0)
+    
+    # and similarly for the validation data 
+    vimageBatch, vlabelBatch = tf.train.shuffle_batch(
+        [vimage, vlabel], batch_size=100,
+        capacity=2000,
+        min_after_dequeue=0)    
+    
+    
   # Input Layer
-  input_layer = tf.reshape(features['image'], [-1, 256, 256, 1])
+    input_layer = tf.reshape(imageBatch, [-1, 256, 256, 1])
+    #input_layer = tf.reshape(features['image'], [-1, 256, 256, 1])
 
   # Convolutional Layer #1
-  conv1 = tf.layers.conv2d(
+    conv1 = tf.layers.conv2d(
       inputs=input_layer,
       filters=32,
       kernel_size=[5, 5],
@@ -128,73 +151,73 @@ def _cnn_model_fn(features, labels, mode):
       activation=tf.nn.relu)
 
   # Pooling Layer #1
-  pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[2, 2], strides=2)
+    pool1 = tf.layers.max_pooling2d(inputs=conv1, pool_size=[2, 2], strides=2)
 
   # Convolutional Layer #2 and Pooling Layer #2
-  conv2 = tf.layers.conv2d(
+    conv2 = tf.layers.conv2d(
       inputs=pool1,
       filters=64,
       kernel_size=[5, 5],
       padding="same",
       activation=tf.nn.relu)
-  pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2)
+    pool2 = tf.layers.max_pooling2d(inputs=conv2, pool_size=[2, 2], strides=2)
 
   # Dense Layer
-  pool2_flat = tf.reshape(pool2, [-1, 262144])
-  dense = tf.layers.dense(inputs=pool2_flat, units=1024, activation=tf.nn.relu)
-  dropout = tf.layers.dropout(
+    pool2_flat = tf.reshape(pool2, [-1, 262144])
+    dense = tf.layers.dense(inputs=pool2_flat, units=1024, activation=tf.nn.relu)
+    dropout = tf.layers.dropout(
       inputs=dense, rate=0.4, training=(mode == learn.ModeKeys.TRAIN))
 
   # Logits Layer
-  logits = tf.layers.dense(inputs=dropout, units=7)
+    logits = tf.layers.dense(inputs=dropout, units=7)
 
-  loss = None
-  train_op = None
+    loss = None
+    train_op = None
 
   # Calculate Loss (for both TRAIN and EVAL modes)
-  if mode != learn.ModeKeys.INFER:
-    onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=7)
-    loss = tf.losses.softmax_cross_entropy(
+    if mode != learn.ModeKeys.INFER:
+        onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=7)
+        loss = tf.losses.softmax_cross_entropy(
         onehot_labels=onehot_labels, logits=logits)
 
   # Configure the Training Op (for TRAIN mode)
-  if mode == learn.ModeKeys.TRAIN:
-    train_op = tf.contrib.layers.optimize_loss(
-        loss=loss,
-        global_step=tf.contrib.framework.get_global_step(),
-        learning_rate=0.001, optimizer="Adam")
+    if mode == learn.ModeKeys.TRAIN:
+        train_op = tf.contrib.layers.optimize_loss(
+          loss=loss,
+          global_step=tf.contrib.framework.get_global_step(),
+          learning_rate=0.001, optimizer="Adam")
 
   # Generate Predictions
-  predictions = {
+    predictions = {
       "classes": tf.argmax(input=logits, axis=1),
       "probabilities": tf.nn.softmax(logits, name="softmax_tensor")
   }
 
   # Return a ModelFnOps object
-  return model_fn_lib.ModelFnOps(mode=mode, loss=loss, train_op=train_op,
+    return model_fn_lib.ModelFnOps(mode=mode, loss=loss, train_op=train_op,
                                  predictions=predictions)
 
 
 def build_estimator(model_dir):
-  return learn.Estimator(
+    return learn.Estimator(
            model_fn=_cnn_model_fn,
            model_dir=model_dir,
            config=tf.contrib.learn.RunConfig(save_checkpoints_secs=180))
 
 
 def get_eval_metrics():
-  return {"accuracy": learn.MetricSpec(metric_fn=tf.metrics.accuracy,
+    return {"accuracy": learn.MetricSpec(metric_fn=tf.metrics.accuracy,
                                        prediction_key="classes")
   }
 
 
 def serving_input_fn():
-  feature_placeholders = {'image': tf.placeholder(tf.float32, [None, 256*256])}
-  features = {
+    feature_placeholders = {'image': tf.placeholder(tf.float32, [None, 256*256])}
+    features = {
     key: tensor
     for key, tensor in feature_placeholders.items()
   }    
-  return learn.utils.input_fn_utils.InputFnOps(
+    return learn.utils.input_fn_utils.InputFnOps(
     features,
     None,
     feature_placeholders
