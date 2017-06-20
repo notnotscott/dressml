@@ -29,13 +29,13 @@ tf.logging.set_verbosity(tf.logging.INFO)
 # Functions to tell TensorFlow how to read a single image from input file - ours first, example repo commented below
 def read_and_decode(filename):
     # convert filenames to a queue for an input pipeline.
-    filenameQ = tf.train.string_input_producer([filename],num_epochs=None)
+    #filenameQ = tf.train.string_input_producer([filename],num_epochs=None)
  
     # object to read records
     recordReader = tf.TFRecordReader()
 
     # read the full set of features for a single example 
-    key, fullExample = recordReader.read(filenameQ)
+    key, fullExample = recordReader.read(filename)
 
     # parse the full example into its' component features.
     features = tf.parse_single_example(
@@ -58,12 +58,12 @@ def read_and_decode(filename):
     image_buffer = features['image/encoded']
 
     # Decode the jpeg
-    with tf.name_scope('decode_jpeg',[image_buffer], None):
+    #with tf.name_scope('decode_jpeg',[image_buffer], None):
         # decode
-        image = tf.image.decode_jpeg(image_buffer, channels=3)
+    image = tf.image.decode_jpeg(image_buffer, channels=3)
     
         # and convert to single precision data type
-        image = tf.image.convert_image_dtype(image, dtype=tf.float32)
+    image = tf.image.convert_image_dtype(image, dtype=tf.float32)
 
 
     # cast image into a single array, where each element corresponds to the greyscale
