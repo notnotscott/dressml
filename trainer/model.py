@@ -71,6 +71,7 @@ def read_and_decode(filename):
     # the "1-\cdot" part inverts the image, so that the background is black.
 
     image=tf.reshape(1-tf.image.rgb_to_grayscale(image),[256*256])
+    image = tf.cast(image, tf.float32) * (1. / 255)
 
     # re-define label as a "one-hot" vector 
     # it will be one of [1,0,...,0], ..., [0,...,0,1] 
