@@ -26,24 +26,77 @@ from tensorflow.contrib.learn.python.learn.estimators import model_fn as model_f
 
 tf.logging.set_verbosity(tf.logging.INFO)
 
+# Functions to tell TensorFlow how to read a single image from input file - ours first, example repo commented below
+def read_and_decode(filename):
+    # convert filenames to a queue for an input pipeline.
+    filenameQ = tf.train.string_input_producer([filename],num_epochs=None)
+ 
+    # object to read records
+    recordReader = tf.TFRecordReader()
 
-def read_and_decode(filename_queue):
-  reader = tf.TFRecordReader()
-  _, serialized_example = reader.read(filename_queue)
+    # read the full set of features for a single example 
+    key, fullExample = recordReader.read(filenameQ)
 
-  features = tf.parse_single_example(
-      serialized_example,
-      features={
-          'image_raw': tf.FixedLenFeature([], tf.string),
-          'label': tf.FixedLenFeature([], tf.int64),
-      })
+    # parse the full example into its' component features.
+    features = tf.parse_single_example(
+        fullExample,
+        features={
+            'image/height': tf.FixedLenFeature([], tf.int64),
+            'image/width': tf.FixedLenFeature([], tf.int64),
+            'image/channels':  tf.FixedLenFeature([], tf.int64),            
+            'image/class/label': tf.FixedLenFeature([],tf.int64),
+            'image/class/text': tf.FixedLenFeature([], dtype=tf.string,default_value=''),
+            'image/format': tf.FixedLenFeature([], dtype=tf.string,default_value=''),
+            'image/filename': tf.FixedLenFeature([], dtype=tf.string,default_value=''),
+            'image/encoded': tf.FixedLenFeature([], dtype=tf.string, default_value='')
+        })
 
-  image = tf.decode_raw(features['image_raw'], tf.uint8)
-  image.set_shape([256*256])
-  image = tf.cast(image, tf.float32) * (1. / 255)
-  label = tf.cast(features['label'], tf.int32)
 
-  return image, label
+    # now we are going to manipulate the label and image features
+
+    label = features['image/class/label']
+    image_buffer = features['image/encoded']
+
+    # Decode the jpeg
+    with tf.name_scope('decode_jpeg',[image_buffer], None):
+        # decode
+        image = tf.image.decode_jpeg(image_buffer, channels=3)
+    
+        # and convert to single precision data type
+        image = tf.image.convert_image_dtype(image, dtype=tf.float32)
+
+
+    # cast image into a single array, where each element corresponds to the greyscale
+    # value of a single pixel. 
+    # the "1-\cdot" part inverts the image, so that the background is black.
+
+    image=tf.reshape(1-tf.image.rgb_to_grayscale(image),[256*256])
+
+    # re-define label as a "one-hot" vector 
+    # it will be one of [1,0,...,0], ..., [0,...,0,1] 
+
+    label=tf.stack(tf.one_hot(label, 7))
+
+    return image, label
+
+
+#def read_and_decode(filename_queue):
+  #reader = tf.TFRecordReader()
+  #_, serialized_example = reader.read(filename_queue)
+
+  #features = tf.parse_single_example(
+      #serialized_example,
+      #features={
+          #'image_raw': tf.FixedLenFeature([], tf.string),
+          #'label': tf.FixedLenFeature([], tf.int64),
+      #})
+
+  #image = tf.decode_raw(features['image_raw'], tf.uint8)
+  #image.set_shape([256*256])
+  #image = tf.cast(image, tf.float32) * (1. / 255)
+  #label = tf.cast(features['label'], tf.int32)
+
+  #return image, label
 
 
 def input_fn(filename, batch_size=100, num_epochs=None):
