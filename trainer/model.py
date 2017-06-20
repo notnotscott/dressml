@@ -99,48 +99,48 @@ def read_and_decode(filename):
   #return image, label
 
 
-#def input_fn(filename, batch_size=100, num_epochs=None):
-    #filename_queue = tf.train.string_input_producer(
-      #[filename], num_epochs=num_epochs)
+def input_fn(filename, batch_size=100, num_epochs=None):
+    filename_queue = tf.train.string_input_producer(
+      [filename], num_epochs=num_epochs)
 
-    #image, label = read_and_decode(filename_queue)
-    #images, labels = tf.train.batch(
-      #[image, label], batch_size=batch_size,
-      #capacity=1000 + 3 * batch_size)
+    image, label = read_and_decode(filename_queue)
+    images, labels = tf.train.batch(
+      [image, label], batch_size=batch_size,
+      capacity=1000 + 3 * batch_size)
 
-    #return {'image': images}, labels
+    return {'image': images}, labels
 
 
-#def get_input_fn(filename, num_epochs=None, batch_size=100):
-#    return lambda: input_fn(filename, batch_size)
+def get_input_fn(filename, num_epochs=None, batch_size=100):
+    return lambda: input_fn(filename, batch_size)
 
 
 def _cnn_model_fn(features, labels, mode):
     
     # associate the "label" and "image" objects with the corresponding features read from 
     # a single example in the training data file
-    image, label = read_and_decode("data/train-00000-of-00001")
+    #image, label = read_and_decode("data/train-00000-of-00001")
     
     # and similarly for the validation data
-    vimage, vlabel = read_and_decode("data/validation-00000-of-00001")
+    #vimage, vlabel = read_and_decode("data/validation-00000-of-00001")
     
     # associate the "label_batch" and "image_batch" objects with a randomly selected batch---
     # of labels and images respectively
-    imageBatch, labelBatch = tf.train.shuffle_batch(
-        [image, label], batch_size=100,
-        capacity=2000,
-        min_after_dequeue=0)
+    #imageBatch, labelBatch = tf.train.shuffle_batch(
+        #[image, label], batch_size=100,
+        #capacity=2000,
+        #min_after_dequeue=0)
     
     # and similarly for the validation data 
-    vimageBatch, vlabelBatch = tf.train.shuffle_batch(
-        [vimage, vlabel], batch_size=100,
-        capacity=2000,
-        min_after_dequeue=0)    
+    #vimageBatch, vlabelBatch = tf.train.shuffle_batch(
+        #[vimage, vlabel], batch_size=100,
+        #capacity=2000,
+        #min_after_dequeue=0)    
     
     
   # Input Layer
-    input_layer = tf.reshape(imageBatch, [-1, 256, 256, 1])
-    #input_layer = tf.reshape(features['image'], [-1, 256, 256, 1])
+    #input_layer = tf.reshape(imageBatch, [-1, 256, 256, 1])
+    input_layer = tf.reshape(features['image'], [-1, 256, 256, 1])
 
   # Convolutional Layer #1
     conv1 = tf.layers.conv2d(
