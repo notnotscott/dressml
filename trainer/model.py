@@ -76,7 +76,7 @@ def read_and_decode(filename):
     # re-define label as a "one-hot" vector 
     # it will be one of [1,0,...,0], ..., [0,...,0,1] 
 
-    label=tf.stack(tf.one_hot(label, 7))
+    #label=tf.stack(tf.one_hot(label, 7))
 
     return image, label
 
@@ -177,9 +177,9 @@ def _cnn_model_fn(features, labels, mode):
 
   # Calculate Loss (for both TRAIN and EVAL modes)
     if mode != learn.ModeKeys.INFER:
-        #onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=1)
+        onehot_labels = tf.one_hot(indices=tf.cast(labels, tf.int32), depth=7)
         loss = tf.losses.softmax_cross_entropy(
-        onehot_labels=labels, logits=logits)
+        onehot_labels=onehot_labels, logits=logits)
 
   # Configure the Training Op (for TRAIN mode)
     if mode == learn.ModeKeys.TRAIN:
