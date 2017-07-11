@@ -129,7 +129,7 @@ def _cnn_model_fn(features, labels, mode):
     input_layer = tf.reshape(features['image'], [-1, 256, 256, 1])
     conv1 = tf.layers.conv2d(
             inputs=input_layer,
-            num_outputs=64,
+            filters=64,
             kernel_size=[11, 11],
             stride=4,
             padding="VALID",
@@ -144,7 +144,7 @@ def _cnn_model_fn(features, labels, mode):
     # Convolutional Layer #2 and Pooling Layer #2
     conv2 = tf.layers.conv2d(
               inputs=pool1,
-              num_outputs=192,
+              filters=192,
               kernel_size=[5, 5],
               scope='conv2'
               )
@@ -155,19 +155,19 @@ def _cnn_model_fn(features, labels, mode):
                                   )
     conv3 = tf.layers.conv2d(
         inputs=pool2,
-        num_outputs=384,
+        filters=384,
         kernel_size=[3, 3],
         scope='conv3'
         )
     conv4 = tf.layers.conv2d(
             inputs=conv3,
-            num_outputs=384,
+            filters=384,
             kernel_size=[3, 3],
             scope='conv4'
             )
     conv5 = tf.layers.conv2d(
             inputs=conv4,
-            num_outputs=256,
+            filters=256,
             kernel_size=[3, 3],
             scope='conv5'
             )
@@ -178,37 +178,36 @@ def _cnn_model_fn(features, labels, mode):
     
     flattened = tf.layers.flatten(inputs=pool5, scope='flat')
 
-    fc6 = tf.layers.fully_connected(inputs=flattened,
-                                            num_outputs=4096,
-                                            scope='fc6')
+    fc6 = tf.layers.dense(inputs=flattened,
+                        units=4096,
+                        scope='fc6')
 
     dropout6 = tf.layers.dropout(inputs=fc6,
-                                         keep_prob=0.5,
-                                         is_training=(mode == learn.ModeKeys.TRAIN),
-                                         scope='dropout6')
+                                 rate=0.5,
+                                 training=(mode == learn.ModeKeys.TRAIN),
+                                 scope='dropout6')
 
-    fc7 = tf.layers.fully_connected(inputs=dropout6,
-                                            num_outputs=4096,
-                                            scope='fc7')
+    fc7 = tf.layers.dense(inputs=dropout6,
+                         units=4096,
+                         scope='fc7')
 
     dropout7 = tf.layers.dropout(inputs=fc7,
-                                         keep_prob=0.5,
-                                         is_training=(mode == learn.ModeKeys.TRAIN),
-                                         scope='dropout7')
+                                 rate=0.5,
+                                 training=(mode == learn.ModeKeys.TRAIN),
+                                 scope='dropout7')
 
-    fc8 = tf.layers.fully_connected(inputs=dropout7,
-                                            num_outputs=4096,
-                                            #activation=tf.nn.relu,
-                                            scope='fc8')
+    fc8 = tf.layers.dense(inputs=dropout7,
+                         units=4096,
+                         #activation=tf.nn.relu,
+                         scope='fc8')
     dropout8 = tf.layers.dropout(inputs=fc8,
-                                         keep_prob=0.5,
-                                         is_training=(mode == learn.ModeKeys.TRAIN),
-                                         scope='dropout8')
+                                 rate=0.5,
+                                 training=(mode == learn.ModeKeys.TRAIN),
+                                 scope='dropout8')
 
-    logits = tf.layers.fully_connected(inputs=dropout8,
-                                               num_outputs=7,
-                                               scope='logits'
-                                              )
+    logits = tf.layers.dense(inputs=dropout8,
+                                     units=7,
+                                     scope='logits')
     
     # associate the "label" and "image" objects with the corresponding features read from 
     # a single example in the training data file
