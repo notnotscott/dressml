@@ -127,7 +127,7 @@ def _cnn_model_fn(features, labels, mode):
       """
     #input_layer = tf.reshape(images, [-1, 256, 256, 1])
     input_layer = tf.reshape(features['image'], [-1, 256, 256, 1])
-    conv1 = tf.layer.conv2d(
+    conv1 = tf.layers.conv2d(
             inputs=input_layer,
             num_outputs=64,
             kernel_size=[11, 11],
@@ -136,76 +136,76 @@ def _cnn_model_fn(features, labels, mode):
             scope='conv1'
             )
     #Pooling Layer #1
-    pool1 = layers_lib.max_pool2d(inputs=conv1,
+    pool1 = tf.layers.max_pooling2d(inputs=conv1,
                                   kernel_size=[3, 3],
                                   stride=2,
                                   scope='pool1'
                                   )
     # Convolutional Layer #2 and Pooling Layer #2
-    conv2 = tf.layer.conv2d(
+    conv2 = tf.layers.conv2d(
               inputs=pool1,
               num_outputs=192,
               kernel_size=[5, 5],
               scope='conv2'
               )
-    pool2 = layers_lib.max_pool2d(inputs=conv2, 
+    pool2 = tf.layers.max_pooling2d(inputs=conv2, 
                                   kernel_size=[3, 3],
                                   stride=2,
                                   scope='pool2'
                                   )
-    conv3 = tf.layer.conv2d(
+    conv3 = tf.layers.conv2d(
         inputs=pool2,
         num_outputs=384,
         kernel_size=[3, 3],
         scope='conv3'
         )
-    conv4 = tf.layer.conv2d(
+    conv4 = tf.layers.conv2d(
             inputs=conv3,
             num_outputs=384,
             kernel_size=[3, 3],
             scope='conv4'
             )
-    conv5 = tf.layer.conv2d(
+    conv5 = tf.layers.conv2d(
             inputs=conv4,
             num_outputs=256,
             kernel_size=[3, 3],
             scope='conv5'
             )
-    pool5 = layers_lib.max_pool2d(inputs=conv5, 
+    pool5 = tf.layers.max_pooling2d(inputs=conv5, 
                                   kernel_size=[3, 3],
                                   stride=2,
                                   scope='pool5')
     
-    flattened = tf.layer.flatten(inputs=pool5, scope='flat')
+    flattened = tf.layers.flatten(inputs=pool5, scope='flat')
 
-    fc6 = tf.layer.fully_connected(inputs=flattened,
+    fc6 = tf.layers.fully_connected(inputs=flattened,
                                             num_outputs=4096,
                                             scope='fc6')
 
-    dropout6 = tf.layer.dropout(inputs=fc6,
+    dropout6 = tf.layers.dropout(inputs=fc6,
                                          keep_prob=0.5,
                                          is_training=(mode == learn.ModeKeys.TRAIN),
                                          scope='dropout6')
 
-    fc7 = tf.layer.fully_connected(inputs=dropout6,
+    fc7 = tf.layers.fully_connected(inputs=dropout6,
                                             num_outputs=4096,
                                             scope='fc7')
 
-    dropout7 = tf.layer.dropout(inputs=fc7,
+    dropout7 = tf.layers.dropout(inputs=fc7,
                                          keep_prob=0.5,
                                          is_training=(mode == learn.ModeKeys.TRAIN),
                                          scope='dropout7')
 
-    fc8 = tf.layer.fully_connected(inputs=dropout7,
+    fc8 = tf.layers.fully_connected(inputs=dropout7,
                                             num_outputs=4096,
                                             #activation=tf.nn.relu,
                                             scope='fc8')
-    dropout8 = tf.layer.dropout(inputs=fc8,
+    dropout8 = tf.layers.dropout(inputs=fc8,
                                          keep_prob=0.5,
                                          is_training=(mode == learn.ModeKeys.TRAIN),
                                          scope='dropout8')
 
-    logits = tf.layer.fully_connected(inputs=dropout8,
+    logits = tf.layers.fully_connected(inputs=dropout8,
                                                num_outputs=7,
                                                scope='logits'
                                               )
@@ -276,7 +276,7 @@ def _cnn_model_fn(features, labels, mode):
 
   # Configure the Training Op (for TRAIN mode)
     if mode == learn.ModeKeys.TRAIN:
-        train_op = tf.layer.optimize_loss(
+        train_op = tf.layers.optimize_loss(
           loss=loss,
           global_step=tf.contrib.framework.get_global_step(),
           learning_rate=0.001, optimizer="Adam")
