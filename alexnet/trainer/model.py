@@ -125,7 +125,8 @@ def _cnn_model_fn(features, labels, mode):
       Returns:
         softmax_linear: output tnesor with the computed logits
       """
-    input_layer = tf.reshape(images, [-1, 256, 256, 1])
+    #input_layer = tf.reshape(images, [-1, 256, 256, 1])
+    input_layer = tf.reshape(features['image'], [-1, 256, 256, 1])
     conv1 = tf.contrib.layers.conv2d(
             inputs=input_layer,
             num_outputs=64,
