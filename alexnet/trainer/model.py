@@ -137,7 +137,7 @@ def _cnn_model_fn(features, labels, mode):
             )
     #Pooling Layer #1
     pool1 = tf.layers.max_pooling2d(inputs=conv1,
-                                  kernel_size=[3, 3],
+                                  pool_size=[3, 3],
                                   stride=2,
                                   name='pool1'
                                   )
@@ -149,7 +149,7 @@ def _cnn_model_fn(features, labels, mode):
               name='conv2'
               )
     pool2 = tf.layers.max_pooling2d(inputs=conv2, 
-                                  kernel_size=[3, 3],
+                                  pool_size=[3, 3],
                                   stride=2,
                                   name='pool2'
                                   )
@@ -172,7 +172,7 @@ def _cnn_model_fn(features, labels, mode):
             name='conv5'
             )
     pool5 = tf.layers.max_pooling2d(inputs=conv5, 
-                                  kernel_size=[3, 3],
+                                  pool_size=[3, 3],
                                   stride=2,
                                   name='pool5')
     
