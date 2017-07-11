@@ -131,7 +131,7 @@ def _cnn_model_fn(features, labels, mode):
             inputs=input_layer,
             filters=64,
             kernel_size=[11, 11],
-            stride=4,
+            strides=(4,4),
             padding="VALID",
             scope='conv1'
             )
