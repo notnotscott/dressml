@@ -133,81 +133,81 @@ def _cnn_model_fn(features, labels, mode):
             kernel_size=[11, 11],
             strides=(4,4),
             padding="VALID",
-            scope='conv1'
+            name='conv1'
             )
     #Pooling Layer #1
     pool1 = tf.layers.max_pooling2d(inputs=conv1,
                                   kernel_size=[3, 3],
                                   stride=2,
-                                  scope='pool1'
+                                  name='pool1'
                                   )
     # Convolutional Layer #2 and Pooling Layer #2
     conv2 = tf.layers.conv2d(
               inputs=pool1,
               filters=192,
               kernel_size=[5, 5],
-              scope='conv2'
+              name='conv2'
               )
     pool2 = tf.layers.max_pooling2d(inputs=conv2, 
                                   kernel_size=[3, 3],
                                   stride=2,
-                                  scope='pool2'
+                                  name='pool2'
                                   )
     conv3 = tf.layers.conv2d(
         inputs=pool2,
         filters=384,
         kernel_size=[3, 3],
-        scope='conv3'
+        name='conv3'
         )
     conv4 = tf.layers.conv2d(
             inputs=conv3,
             filters=384,
             kernel_size=[3, 3],
-            scope='conv4'
+            name='conv4'
             )
     conv5 = tf.layers.conv2d(
             inputs=conv4,
             filters=256,
             kernel_size=[3, 3],
-            scope='conv5'
+            name='conv5'
             )
     pool5 = tf.layers.max_pooling2d(inputs=conv5, 
                                   kernel_size=[3, 3],
                                   stride=2,
-                                  scope='pool5')
+                                  name='pool5')
     
-    flattened = tf.layers.flatten(inputs=pool5, scope='flat')
+    flattened = tf.contrib.layers.flatten(inputs=pool5, scope='flat')
 
     fc6 = tf.layers.dense(inputs=flattened,
                         units=4096,
-                        scope='fc6')
+                        name='fc6')
 
     dropout6 = tf.layers.dropout(inputs=fc6,
                                  rate=0.5,
                                  training=(mode == learn.ModeKeys.TRAIN),
-                                 scope='dropout6')
+                                 name='dropout6')
 
     fc7 = tf.layers.dense(inputs=dropout6,
                          units=4096,
-                         scope='fc7')
+                         name='fc7')
 
     dropout7 = tf.layers.dropout(inputs=fc7,
                                  rate=0.5,
                                  training=(mode == learn.ModeKeys.TRAIN),
-                                 scope='dropout7')
+                                 name='dropout7')
 
     fc8 = tf.layers.dense(inputs=dropout7,
                          units=4096,
                          #activation=tf.nn.relu,
-                         scope='fc8')
+                         name='fc8')
     dropout8 = tf.layers.dropout(inputs=fc8,
                                  rate=0.5,
                                  training=(mode == learn.ModeKeys.TRAIN),
-                                 scope='dropout8')
+                                 name='dropout8')
 
     logits = tf.layers.dense(inputs=dropout8,
                                      units=7,
-                                     scope='logits')
+                                     name='logits')
     
     # associate the "label" and "image" objects with the corresponding features read from 
     # a single example in the training data file
