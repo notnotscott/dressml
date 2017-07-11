@@ -275,7 +275,7 @@ def _cnn_model_fn(features, labels, mode):
 
   # Configure the Training Op (for TRAIN mode)
     if mode == learn.ModeKeys.TRAIN:
-        train_op = tf.layers.optimize_loss(
+        train_op = tf.contrib.layers.optimize_loss(
           loss=loss,
           global_step=tf.contrib.framework.get_global_step(),
           learning_rate=0.001, optimizer="Adam")
