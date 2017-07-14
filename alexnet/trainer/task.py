@@ -104,7 +104,7 @@ if __name__ == '__main__':
   parser.add_argument(
       '--min_eval_frequency',
       help='Minimum number of training steps between evaluations',
-      default=1,
+      default=10,
       type=int
   )
 

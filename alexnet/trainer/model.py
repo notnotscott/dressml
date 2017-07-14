@@ -121,9 +121,9 @@ def _cnn_model_fn(features, labels, mode):
     
     #COPY/PASTE inference fnc from tf_workbench/blob/master/alexnet_redo/trainer/model.py modified for grayscale
     
-    """Bild model up to where it may be used for inference
+    """Build model up to where it may be used for inference
       Returns:
-        softmax_linear: output tnesor with the computed logits
+        softmax_linear: output tensor with the computed logits
       """
     #input_layer = tf.reshape(images, [-1, 256, 256, 1])
     input_layer = tf.reshape(features['image'], [-1, 256, 256, 1])
